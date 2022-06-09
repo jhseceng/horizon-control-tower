@@ -63,8 +63,9 @@ Mappings:
       StackNameRootEb: "CrowdStrike-CSPM-Integration-Root-EB"
       CSRoleName: "CrowdStrikeCSPMConnector"
       cf: "https://cs-prod-cloudconnect-templates.s3.amazonaws.com/aws_cspm_cloudformation_v2.json"
-      CfNoCt: "https://cs-prod-cloudconnect-templates.s3.amazonaws.com/aws_cspm_cloudformation_v2_no_cloudtrail.json"
       cfiam: "https://cs-prod-cloudconnect-templates.s3.amazonaws.com/aws_cspm_cloudformation_iam_v2.json"
+      cfeb: "https://cs-prod-cloudconnect-templates.s3.amazonaws.com/aws_cspm_cloudformation_eb_v2.json"
+      
     eu:
       CSAccountNumber: "292230061137"
       StackName: "CrowdStrike-CSPM-Integration"
@@ -72,8 +73,8 @@ Mappings:
       StackNameRootEb: "CrowdStrike-CSPM-Integration-Root-EB"
       CSRoleName: "CrowdStrikeCSPMConnector"
       cf: "https://cs-prod-cloudconnect-templates.s3.amazonaws.com/aws_cspm_cloudformation_v2.json"
-      CfNoCt: "https://cs-prod-cloudconnect-templates.s3.amazonaws.com/aws_cspm_cloudformation_v2_no_cloudtrail.json"
       cfiam: "https://cs-prod-cloudconnect-templates.s3.amazonaws.com/aws_cspm_cloudformation_iam_v2.json"
+      cfeb: "https://cs-prod-cloudconnect-templates.s3.amazonaws.com/aws_cspm_cloudformation_eb_v2.json"
 
   S3perRegion:
     us-east-1:
