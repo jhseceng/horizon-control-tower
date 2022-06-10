@@ -16,7 +16,7 @@ Parameters:
   CSCloud:
     Type: String
     Default: us1
-    AllowedValues: ["us1", "us2", "eu1", "gov"]
+    AllowedValues: ["us1", "us2", "eu1", "usgov1"]
     Description: CrowdStrike Cloud
   EnableIOA:
     Type: String
@@ -74,7 +74,7 @@ Mappings:
       cf: "https://cs-prod-cloudconnect-templates.s3.amazonaws.com/aws_cspm_cloudformation_v2.json"
       cfiam: "https://cs-prod-cloudconnect-templates.s3.amazonaws.com/aws_cspm_cloudformation_iam_v2.json"
       cfeb: "https://cs-prod-cloudconnect-templates.s3.amazonaws.com/aws_cspm_cloudformation_eb_v2.json"
-    gov:
+    usgov1:
       CSAccountNumber: "287238819661"
       StackName: "CrowdStrike-CSPM-Integration"
       StackNameEb: "CrowdStrike-CSPM-Integration-EB"
