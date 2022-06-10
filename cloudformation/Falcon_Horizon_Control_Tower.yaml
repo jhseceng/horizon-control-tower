@@ -74,6 +74,16 @@ Mappings:
       cf: "https://cs-prod-cloudconnect-templates.s3.amazonaws.com/aws_cspm_cloudformation_v2.json"
       cfiam: "https://cs-prod-cloudconnect-templates.s3.amazonaws.com/aws_cspm_cloudformation_iam_v2.json"
       cfeb: "https://cs-prod-cloudconnect-templates.s3.amazonaws.com/aws_cspm_cloudformation_eb_v2.json"
+    gov:
+      CSAccountNumber: "287238819661"
+      StackName: "CrowdStrike-CSPM-Integration"
+      StackNameEb: "CrowdStrike-CSPM-Integration-EB"
+      StackNameRootEb: "CrowdStrike-CSPM-Integration-Root-EB"
+      CSRoleName: "CrowdStrikeCSPMConnector"
+      cf: "https://cs-prod-cloudconnect-templates.s3.amazonaws.com/aws_cspm_cloudformation_iom_ioa_lambda_reg_v2.json"
+      cfiam: "https://cs-prod-cloudconnect-templates.s3.amazonaws.com/aws_cspm_cloudformation_iam_v2.json"
+      cfeb: "https://cs-prod-cloudconnect-templates.s3.amazonaws.com/aws_cspm_cloudformation_eb_gov_comm_v2.json"
+
 
   S3perRegion:
     us-east-1:
@@ -203,7 +213,7 @@ Resources:
       AdministrationRoleARN: !Join [ ':', [ 'arn:aws:iam:', !Ref 'AWS::AccountId', 'role/AWSCloudFormationStackSetAdministrationRole' ] ]
       ExecutionRoleName: AWSCloudFormationStackSetExecutionRole
       StackSetName: !FindInMap [ CrowdStrikeCSPMRoleTemplateURL, !Ref CSCloud, StackNameRootEb ]
-      TemplateURL: !FindInMap [ CrowdStrikeCSPMRoleTemplateURL, !Ref CSCloud, cfeb ]
+      TemplateURL: !FindInMap [ CrowdStrikeCSPMRoleTemplateURL, !Ref CSCloud, cf ]
 #
 # Org StackSet with IOA enabled - Creates Eventbridge rules in each region in each child account
 #
