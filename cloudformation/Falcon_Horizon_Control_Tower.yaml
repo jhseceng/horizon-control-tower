@@ -97,9 +97,7 @@ Metadata:
           - FalconSecret
 Conditions:
   ShouldCreateIOAResources: !Equals [ !Ref 'EnableIOA', true ]
-  CreateMasterStackInstance: !And
-    - !Equals [ !Ref 'EnableIOA', true ]
-    - !Equals [ !Ref 'PushMasterAccountStackset', true ]
+
 
 Resources:
   ExecutionRole:
@@ -515,14 +513,14 @@ Resources:
 ##
 ## Trigger the lambda function to provision/deprovision the account with CRWD using a CFT.
 ##
-  TriggerIOASetupRootAcctLambda:
-    Condition: CreateMasterStackInstance
-    Type: 'Custom::TriggerLambda'
-    DependsOn:
-      - LambdaToCreateStackSetRole
-    Properties:
-      CTBucketName: !GetAtt TriggerRegisterAccountLambda.aws_cloudtrail_bucket_name
-      ServiceToken: !GetAtt
-        - IOASetupRootAcct
-        - Arn
+#  TriggerIOASetupRootAcctLambda:
+
+#    Type: 'Custom::TriggerLambda'
+#    DependsOn:
+#      - LambdaToCreateStackSetRole
+#    Properties:
+#      CTBucketName: !GetAtt TriggerRegisterAccountLambda.aws_cloudtrail_bucket_name
+#      ServiceToken: !GetAtt
+#        - IOASetupRootAcct
+#        - Arn
 
