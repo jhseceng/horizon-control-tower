@@ -32,12 +32,11 @@ def get_regions():
     return regions
 
 
-def create_stackset(stackset_name, account_id):
+def create_stackset(stackset_name, account_id, region_list):
     """ Create CRWD Horizon Stackset on the Master Account """
     client_cft = boto3.client('cloudformation')
     result = {}
     try:
-        region_list = get_regions()
         if region_list:
             client_cft.create_stack_instances(
                 StackSetName=stackset_name,
@@ -172,12 +171,15 @@ def lambda_handler(event, context):
     try:
         logger.info('Got event {}'.format(event))
         logger.info('Context {}'.format(context))
-        ct_bucket = event['ResourceProperties']['CTBucketName']
+
         aws_region = os.environ["AWSRegion"]
-        ioa_stackset_root = os.environ["StackNameRootEb"]
         ioa_enabled = os.environ["EnableIOA"]
-        use_existing_cloudtrail = os.environ["UseExistingCloudtrail"]
-        push_master_stackset = os.environ["PushMasterAccountStackset"]
+        ioa_stackset_root = os.environ["StackNameRootEb"]
+
+        ct_bucket = event['ResourceProperties']['CTBucketName']
+        push_master_stackset = event['ResourceProperties']["PushMasterAccountStackset"]
+        use_existing_cloudtrail = event['ResourceProperties']["UseExistingCloudtrail"]
+
         account_id = get_master_id()
         logger.info('EVENT Received: {}'.format(event))
         response_data = {}
@@ -189,7 +191,7 @@ def lambda_handler(event, context):
             cloudtrail_result = False
             if ioa_enabled == 'true':
                 if push_master_stackset:
-                    stack_op_result = create_stackset(ioa_stackset_root, account_id)
+                    stack_op_result = create_stackset(ioa_stackset_root, account_id, get_regions())
                     logger.info('stack_op_result: {}'.format(stack_op_result))
                 else:
                     # Skip deployment of Stackset in master

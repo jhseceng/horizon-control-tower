@@ -208,12 +208,14 @@ Resources:
         - ParameterKey: CSAccountNumber
           ParameterValue: !FindInMap [ CrowdStrikeCSPMRoleTemplateURL, !Ref CSCloud, CSAccountNumber ]
         - ParameterKey: CSEventBusName
-          ParameterValue: !GetAtt TriggerRegisterAccountLambda.external_id
+          ParameterValue: !GetAtt TriggerRegisterAccountLambda.eventbus_name
+        - ParameterKey: DefaultEventBusRegion
+          ParameterValue: !Ref AWS::Region
       PermissionModel: SELF_MANAGED
       AdministrationRoleARN: !Join [ ':', [ 'arn:aws:iam:', !Ref 'AWS::AccountId', 'role/AWSCloudFormationStackSetAdministrationRole' ] ]
       ExecutionRoleName: AWSCloudFormationStackSetExecutionRole
       StackSetName: !FindInMap [ CrowdStrikeCSPMRoleTemplateURL, !Ref CSCloud, StackNameRootEb ]
-      TemplateURL: !FindInMap [ CrowdStrikeCSPMRoleTemplateURL, !Ref CSCloud, cf ]
+      TemplateURL: !FindInMap [ CrowdStrikeCSPMRoleTemplateURL, !Ref CSCloud, cfeb ]
 #
 # Org StackSet with IOA enabled - Creates Eventbridge rules in each region in each child account
 #
@@ -230,7 +232,7 @@ Resources:
         - ParameterKey: CSAccountNumber
           ParameterValue: !FindInMap [ CrowdStrikeCSPMRoleTemplateURL, !Ref CSCloud, CSAccountNumber ]
         - ParameterKey: CSEventBusName
-          ParameterValue: !GetAtt TriggerRegisterAccountLambda.external_id
+          ParameterValue: !GetAtt TriggerRegisterAccountLambda.eventbus_name
       PermissionModel: SELF_MANAGED
       AdministrationRoleARN: !Join [ ':', [ 'arn:aws:iam:', !Ref 'AWS::AccountId', 'role/service-role/AWSControlTowerStackSetRole' ] ]
       ExecutionRoleName: AWSControlTowerExecution
@@ -320,6 +322,7 @@ Resources:
             - '"}'
   LambdaToCreateStackSetRole:
     Type: AWS::IAM::Role
+    Condition: ShouldCreateIOAResources
     Properties:
       RoleName: !Join
         - '-'
@@ -413,6 +416,7 @@ Resources:
         S3Key: falconpy-layer.zip
       Description: Layer for requests package
       LayerName: falconpy-package
+
   CrowdStrikeHorizonCaptureControlTowerLifeCycleEvents:
     Type: AWS::Events::Rule
     Properties:
@@ -470,6 +474,7 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
   PushHorizonStackInstances:
     Type: AWS::Lambda::Function
+    Condition: ShouldCreateIOAResources
     Properties:
       Code:
         S3Bucket: !Ref S3Bucket
@@ -499,6 +504,7 @@ Resources:
 #
   IOASetupRootAcct:
     Condition: ShouldCreateIOAResources
+    DependsOn: IOAStackSetRootAcct
     Type: AWS::Lambda::Function
     Properties:
       Code:
@@ -508,10 +514,7 @@ Resources:
       Layers: [ !Ref FalconpyLayer ]
       Environment:
         Variables:
-          PushMasterAccountStackset: !Ref PushMasterAccountStackset
-          BucketName: !GetAtt TriggerRegisterAccountLambda.aws_cloudtrail_bucket_name
           AWSRegion: !Ref AWS::Region
-          UseExistingCloudtrail: !Ref UseExistingCloudtrail
           EnableIOA: !Ref EnableIOA
           StackNameRootEb: !FindInMap [ CrowdStrikeCSPMRoleTemplateURL, !Ref CSCloud, StackNameRootEb ]
       Handler: ioa_setup_master.lambda_handler
@@ -523,14 +526,17 @@ Resources:
 ##
 ## Trigger the lambda function to provision/deprovision the account with CRWD using a CFT.
 ##
-#  TriggerIOASetupRootAcctLambda:
-
-#    Type: 'Custom::TriggerLambda'
-#    DependsOn:
-#      - LambdaToCreateStackSetRole
-#    Properties:
-#      CTBucketName: !GetAtt TriggerRegisterAccountLambda.aws_cloudtrail_bucket_name
-#      ServiceToken: !GetAtt
-#        - IOASetupRootAcct
-#        - Arn
+  TriggerIOASetupRootAcctLambda:
+    Condition: ShouldCreateIOAResources
+    Type: 'Custom::TriggerLambda'
+    DependsOn:
+      - LambdaToCreateStackSetRole
+    Properties:
+      StackRole: !Ref LambdaToCreateStackSetRole
+      UseExistingCloudtrail: !Ref UseExistingCloudtrail
+      CTBucketName: !GetAtt TriggerRegisterAccountLambda.aws_cloudtrail_bucket_name
+      PushMasterAccountStackset: !Ref PushMasterAccountStackset
+      ServiceToken: !GetAtt
+        - IOASetupRootAcct
+        - Arn
 

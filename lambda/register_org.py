@@ -93,7 +93,6 @@ def lambda_handler(event, context):
     # ]
     CFT = boto3.client('cloudformation')
     OrgId, AccountId = get_master_id()
-
     aws_region = event['ResourceProperties']['aws_region']
     CSCloud = event['ResourceProperties']['CSCloud']
     FalconClientId = event['ResourceProperties']['FalconClientId']
